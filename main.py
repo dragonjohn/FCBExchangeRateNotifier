@@ -25,8 +25,20 @@ def ConfigSectionMap(section):
     return dict1
 
 def main():
+    #load expect exchange rate
+    #print (Config.sections())
+    MAX_USD = ConfigSectionMap("Expect Rule")['max_usd']
+    MIN_USD = ConfigSectionMap("Expect Rule")['min_usd']
+    MAX_JPY = ConfigSectionMap("Expect Rule")['max_jpy']
+    MIN_JPY = ConfigSectionMap("Expect Rule")['min_jpy']
+    #modify if you want to observe other currency
+    expect_rate = [float(MAX_USD), float(MIN_USD), float(MAX_JPY), float(MIN_JPY)]
+    print ("MAX_USD, MIN_USD, MAX_JPY, MIN_JPY =>", expect_rate)
+    
+    
     #find spot and cash rate
     target_flag = False
+    exchange_currency = ["USD", "JPY"]
     exchange_rate_set = []
     for row in res.iter_lines():
         if "U.S. Dollar(USD)" in row:
@@ -39,20 +51,20 @@ def main():
                 #print row
                 exchange_rate_set.append(float(row))
                 target_flag = False
-    #print(exchange_rate_set)
+    print("Current spot, cash =>", exchange_rate_set)
     
     for idx, rate in enumerate(exchange_rate_set):
         if idx%2 == 0:
-            print rate
-            # if rate < USD_target, send email notification
+            #print rate
+            if rate > expect_rate[idx]:
+                print (rate, expect_rate[idx])
+                print ("sell %s out" % exchange_currency[idx/2])
+            if rate < expect_rate[idx+1]:
+                print (rate, expect_rate[idx+1])
+                print ("buy %s in" % exchange_currency[idx/2])
+            
     
     
-    #print (Config.sections())
-    MAX_USD = ConfigSectionMap("Expect Rule")['max_usd']
-    MIN_USD = ConfigSectionMap("Expect Rule")['min_usd']
-    MAX_JPY = ConfigSectionMap("Expect Rule")['max_jpy']
-    MIN_JPY = ConfigSectionMap("Expect Rule")['min_jpy']
-    print (MAX_USD, MIN_USD, MAX_JPY, MIN_JPY)
 
 
     
